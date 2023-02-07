@@ -1,4 +1,6 @@
+import sched
 import mesa
+import random
 
 from .agent import Cop, Citizen
 
@@ -28,6 +30,15 @@ class EpsteinCivilViolence(mesa.Model):
         max_iters: model may not have a natural stopping point, so we set a
             max.
     """
+    seed = random.random()
+
+    schedule_types = {
+        "Sequential": mesa.time.BaseScheduler,
+        "Random": mesa.time.RandomActivation,
+        "Simultaneous": mesa.time.SimultaneousActivation,
+    }
+    
+    activation_types = ["default","linear","exponential"]
 
     def __init__(
         self,
@@ -43,6 +54,9 @@ class EpsteinCivilViolence(mesa.Model):
         arrest_prob_constant=2.3,
         movement=True,
         max_iters=1000,
+        schedule_type="Random",
+        activation_type="default",
+        min_proportion=0.8,
     ):
         super().__init__()
         self.width = width
@@ -59,6 +73,9 @@ class EpsteinCivilViolence(mesa.Model):
         self.max_iters = max_iters
         self.iteration = 0
         self.schedule = mesa.time.RandomActivation(self)
+        self.schedule = self.schedule_types[schedule_type](self)
+        self.activation_type = activation_type
+        self.min_proportion = min_proportion
         self.grid = mesa.space.Grid(width, height, torus=True)
 
         # agent counts

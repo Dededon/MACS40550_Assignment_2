@@ -3,3 +3,5 @@
 *.vsidx
 *.lock
 *.sqlite
+.vs/MACS40550_Assignment_2/v17/.suo
+*.pyc

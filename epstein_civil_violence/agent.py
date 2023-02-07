@@ -1,4 +1,5 @@
 import math
+from this import d, s
 
 import mesa
 
@@ -78,10 +79,26 @@ class Citizen(mesa.Agent):
         self.update_neighbors()
         self.update_estimated_arrest_probability()
         net_risk = self.risk_aversion * self.arrest_probability
-        if self.grievance - net_risk > self.threshold:
-            self.condition = "Active"
-        else:
-            self.condition = "Quiescent"
+
+        proportion = self.actives_in_vision / len(self.neighbors)
+
+
+        # New update mechanism with probability pdfs
+        if self.condition == "Quiescent":
+            if self.grievance - net_risk > self.threshold:
+                self.condition = "Active"
+            else:
+                if self.model.activation_type == "linear":
+                    if self.random.random() < proportion / self.model.min_proportion:
+                        self.condition = "Active"
+                elif self.model.activation_type == "quadratic":
+                    if self.random.random() < proportion / math.pow(self.model.min_proportion, 2): 
+                        self.condition = "Active"
+                elif self.model.activation_type == "logistic":
+                    p = math.log(math.e * proportion / self.model.min_proportion)
+                    if self.random.random() < p and p >= 0:
+                        self.condition = "Active"
+
         if self.model.movement and self.empty_neighbors:
             new_pos = self.random.choice(self.empty_neighbors)
             self.model.grid.move_agent(self, new_pos)
@@ -90,6 +107,7 @@ class Citizen(mesa.Agent):
         """
         Look around and see who my neighbors are
         """
+        
         self.neighborhood = self.model.grid.get_neighborhood(
             self.pos, moore=True, radius=self.vision
         )
@@ -112,6 +130,7 @@ class Citizen(mesa.Agent):
                 and c.jail_sentence == 0
             ):
                 actives_in_vision += 1
+        self.actives_in_vision = actives_in_vision
         self.arrest_probability = 1 - math.exp(
             -1
             * self.model.arrest_prob_constant
