@@ -38,7 +38,7 @@ class EpsteinCivilViolence(mesa.Model):
         "Simultaneous": mesa.time.SimultaneousActivation,
     }
     
-    activation_types = ["default","linear","exponential"]
+    activation_types = ["default","linear","quadratic","logistic"]
 
     def __init__(
         self,

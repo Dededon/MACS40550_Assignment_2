@@ -2,7 +2,7 @@ import mesa
 
 from .model import EpsteinCivilViolence
 from .agent import Citizen, Cop
-from mesa.visualization.UserParam import Slider
+from mesa.visualization.UserParam import Slider, Choice
 from mesa.visualization.modules import ChartModule, TextElement
 
 
@@ -106,7 +106,7 @@ def citizen_cop_portrayal(agent):
 
     return portrayal
 
-
+activation_types = ["default","linear","quadratic","logistic"]
 # default model params do not match netlogo defaults and model does not exhibit
 # the same behavior as netlogo
 # model_params = dict(
@@ -124,12 +124,15 @@ def citizen_cop_portrayal(agent):
 model_params = dict(
     height=40,
     width=40,
+    activation_type=Choice("Aggregate Function", "default", activation_types),
     citizen_density=Slider("Initial Agent Density", 0.7, 0.0, 0.9, 0.1),
     cop_density=Slider("Initial Cop Density", 0.04, 0.0, 0.1, 0.01),
     citizen_vision=Slider("Citizen Vision", 7, 1, 10, 1),
     cop_vision=Slider("Cop Vision", 7, 1, 10, 1),
     legitimacy=Slider("Government Legitimacy", 0.82, 0.0, 1, 0.01),
     max_jail_term=Slider("Max Jail Term", 30, 0, 50, 1),
+    min_proportion=Slider("Tau", 0.75, 0.5, 1, 0.05),
+    
 )
 canvas_element = mesa.visualization.CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
 server = mesa.visualization.ModularServer(
