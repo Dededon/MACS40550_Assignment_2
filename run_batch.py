@@ -19,22 +19,15 @@ fixed_parameters = {
     'active_threshold':0.1,
     'arrest_prob_constant':2.3,
     'movement':True,
-    'max_iters':250,
+    'max_iters':200,
 }
 
 params = {
     'activation_type': ["default","linear","quadratic","logistic"],
-    'min_proportion': [*np.arange(0.5,1.1,0.1)]
+    'min_proportion': [*np.arange(0.5,1,0.1)]
 }
 
-def dict_product(dicts): #could just use the below but it's cleaner this way
-    """
-    >>> list(dict_product(dict(number=[1,2], character='ab')))
-    [{'character': 'a', 'number': 1},
-     {'character': 'a', 'number': 2},
-     {'character': 'b', 'number': 1},
-     {'character': 'b', 'number': 2}]
-    """
+def dict_product(dicts): 
     return (dict(zip(dicts, x)) for x in product(*dicts.values()))
 
 parameters_list = [*dict_product(params)]
@@ -42,12 +35,14 @@ parameters_list = [*dict_product(params)]
 batch_run = FixedBatchRunner(EpsteinCivilViolence, parameters_list,
                              fixed_parameters,
                              iterations=10,
+                             max_steps=200,
                              model_reporters={
                                 "Quiescent": lambda m: m.count_quiescent(m),
                                 "Active": lambda m: m.count_active(m),
                                 "Jailed": lambda m: m.count_jailed(m),
+                                "Average Jailing Term": lambda m: m.get_average_jail_term(m)
                              },
-                             max_steps=250)
+                             )
 
 
 batch_run.run_all()

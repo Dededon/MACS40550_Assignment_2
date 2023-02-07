@@ -92,6 +92,7 @@ class EpsteinCivilViolence(mesa.Model):
             "Jailed": self.count_jailed,
             "Citizens": self.count_citizens,
             "Cops": self.count_cops,
+            "Average Jailing Term": self.get_average_jail_term,
         }
         agent_reporters = {
             "x": lambda a: a.pos[0],
@@ -212,6 +213,15 @@ class EpsteinCivilViolence(mesa.Model):
         }
 
     @staticmethod
+    def count_quiescent(model):
+        return model.count_type_citizens(model, "Quiescent")
+
+    @staticmethod
+    def count_active(model):
+        return model.count_type_citizens(model, "Active")
+
+
+    @staticmethod
     def get_average_jail_term(model):
         """
         Helper method to calculate average jail term.
@@ -220,4 +230,7 @@ class EpsteinCivilViolence(mesa.Model):
         for agent in model.schedule.agents:
             if agent.breed == "citizen" and agent.jail_sentence > 0:
                 total += agent.jail_sentence
-        return total / model.jail_count
+        if model.jail_count == 0:
+            return 0
+        else:
+            return total / model.jail_count
