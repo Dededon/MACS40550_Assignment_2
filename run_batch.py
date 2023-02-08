@@ -35,7 +35,7 @@ parameters_list = [*dict_product(params)]
 batch_run = FixedBatchRunner(EpsteinCivilViolence, parameters_list,
                              fixed_parameters,
                              iterations=10,
-                             max_steps=200,
+                             max_steps=100,
                              model_reporters={
                                 "Quiescent": lambda m: m.count_quiescent(m),
                                 "Active": lambda m: m.count_active(m),
@@ -52,4 +52,4 @@ batch_step_raw = batch_run.get_collector_model()
 batch_end.to_csv("output/batch_all.csv")
 
 for key,df in batch_step_raw.items():
-    df.to_csv(f'step/activation_{key[0]}_tau_{key[1]}_{key[2]}.csv')
+    df.to_csv(f'output/step/activation_{key[0]}_tau_{key[1]}_{key[2]}.csv')
